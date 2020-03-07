@@ -12,7 +12,8 @@ class Directory extends Component {
   render() {
     return (
       <div className='directory-menu' >
-        {this.state.sections.map(section => <MenuItem key={section.id} section={section} />)}
+        {/* {...otherSectionProps} is equivalent to destructure all the elements of the object and pass them as title={title}... */}
+        {this.state.sections.map(({ id, ...otherSectionProps }) => <MenuItem key={id} {...otherSectionProps} />)}
       </div >
     )
   };
