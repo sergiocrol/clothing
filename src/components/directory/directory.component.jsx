@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 
 import MenuItem from '../menu-item/menu-item.component';
 import './directory.styles.scss';
-import sections from '../../data/sections';
+import SECTIONS from '../../data/sections';
 
 class Directory extends Component {
   state = {
-    sections
+    sections: SECTIONS
   }
 
   render() {
