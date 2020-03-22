@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { auth, createUserProfileDocument } from './firebase/firebase.utils';
@@ -48,12 +48,17 @@ class App extends Component {
         <Switch>
           <Route exact path='/' component={HomePage} />
           <Route exact path='/shop' component={ShopPage} />
-          <Route exact path='/signin' component={SignPage} />
+          <Route exact path='/signin' render={() => this.props.currentUser ? <Redirect to='/' /> : <SignPage />} />
         </Switch>
       </div>
     )
   };
 }
+
+// We need our current user, so if the user is logged in we want not to get access to SignPage
+const mapStateToProps = ({ user }) => ({
+  currentUser: user.currentUser
+});
 
 // Here we save in props a property called setCurrentUser which will run user.action.js; this property will be used above,
 // inside componentDidMount, passing a user.
@@ -61,4 +66,4 @@ const mapDispatchToProps = dispatch => ({
   setCurrentUser: user => dispatch(setCurrentUser(user))
 });
 
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);
