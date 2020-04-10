@@ -5,7 +5,12 @@ import logger from 'redux-logger';
 
 import rootReducer from './root-reducer';
 
-const middlewares = [logger];
+const middlewares = [];
+
+// this is necessary if we want to show the logs only in local, and not in production
+if (process.env.NODE_ENV === 'development') {
+  middlewares.push(logger)
+}
 
 export const store = createStore(rootReducer, applyMiddleware(...middlewares));
 
