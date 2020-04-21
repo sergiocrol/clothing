@@ -23,7 +23,11 @@ class App extends Component {
 
     const { setCurrentUser } = this.props;
 
-    // Open the subscription between Firebase and our app
+    /* Open the subscription between Firebase and our app. It is an observable pattern (next, error, complete)
+     auth.onAuthStateChanged(next, error, complete), so whenever we pass a function, we are instantiating some listener on this
+     onAuthStateChanged observable
+     Firebase is a live database, so complete here is rarely happening, because users can be signin again an again, there is
+     not a moment when Firebase stops and does not admit more signins */
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
 
       if (userAuth) {
@@ -32,17 +36,16 @@ class App extends Component {
           setCurrentUser({
             id: snapShot.id,
             ...snapShot.data()
-          })
-        })
-      } else {
-        setCurrentUser(userAuth);
+          });
+        });
       }
 
+      setCurrentUser(userAuth);
     });
   }
 
   componentWillUnmount() {
-    // Close the subscription
+    // Close the subscription. The listener instantiated in onAuthStateChanged is still listening, so we need to stop.
     this.unsubscribeFromAuth();
   }
 

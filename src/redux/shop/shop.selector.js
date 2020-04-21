@@ -8,12 +8,12 @@ export const selectCollections = createSelector(
 );
 
 // Selector to convert an object into an array (since collections-overview is already iterating our transformed shop.data as array)
-export const selectCollectionsForPpreview = createSelector(
+export const selectCollectionsForPreview = createSelector(
   [selectCollections],
-  collections => Object.keys(collections).map(key => collections[key])
+  collections => collections ? Object.keys(collections).map(key => collections[key]) : []
 )
 
 export const selectCollection = collectionUrlParam => createSelector(
   [selectCollections],
-  collections => collections[collectionUrlParam]
+  collections => (collections ? collections[collectionUrlParam] : null)
 )
