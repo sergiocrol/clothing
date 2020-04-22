@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './App.css';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -16,19 +16,16 @@ import { toggleCartHidden } from './redux/cart/cart.actions';
 import { selectCurrentUser } from './redux/user/user.selectors';
 import { selectCartHidden } from './redux/cart/cart.selectors';
 
-class App extends Component {
-  unsubscribeFromAuth = null;
+const App = ({ setCurrentUser, hidden, isCartHidden, currentUser }) => {
+  const [unsubscribeFromAuth, setUnsubscribeFromAuth] = useState(() => null);
 
-  componentDidMount() {
-
-    const { setCurrentUser } = this.props;
-
+  useEffect(() => {
     /* Open the subscription between Firebase and our app. It is an observable pattern (next, error, complete)
      auth.onAuthStateChanged(next, error, complete), so whenever we pass a function, we are instantiating some listener on this
      onAuthStateChanged observable
      Firebase is a live database, so complete here is rarely happening, because users can be signin again an again, there is
      not a moment when Firebase stops and does not admit more signins */
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+    const unsub = auth.onAuthStateChanged(async userAuth => {
 
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
@@ -39,33 +36,33 @@ class App extends Component {
           });
         });
       }
-
       setCurrentUser(userAuth);
     });
-  }
 
-  componentWillUnmount() {
-    // Close the subscription. The listener instantiated in onAuthStateChanged is still listening, so we need to stop.
-    this.unsubscribeFromAuth();
-  }
+    setUnsubscribeFromAuth(() => unsub);
 
-  render() {
-    const { hidden, isCartHidden } = this.props;
-    return (
-      <>
-        <Header />
-        <div onClick={isCartHidden ? null : hidden}>
-          <Switch >
-            <Route exact path='/' component={HomePage} />
-            <Route path='/shop' component={ShopPage} />
-            <Route exact path='/signin' render={() => this.props.currentUser ? <Redirect to='/' /> : <SignPage />} />
-            <Route excat path='/checkout' component={CheckoutPage} />
-          </Switch>
-        </div>
-      </>
-    )
-  };
-}
+    // This returning function is the componentWillUnmount
+    return () => {
+      unsubscribeFromAuth();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <>
+      <Header />
+      <div onClick={isCartHidden ? null : hidden}>
+        <Switch >
+          <Route exact path='/' component={HomePage} />
+          <Route path='/shop' component={ShopPage} />
+          <Route exact path='/signin' render={() => currentUser ? <Redirect to='/' /> : <SignPage />} />
+          <Route excat path='/checkout' component={CheckoutPage} />
+        </Switch>
+      </div>
+    </>
+  )
+};
+
 
 // We need our current user, so if the user is logged in we want not to get access to SignPage
 const mapStateToProps = createStructuredSelector({
