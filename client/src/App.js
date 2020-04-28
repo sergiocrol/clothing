@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './App.css';
+
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
@@ -15,6 +15,8 @@ import { setCurrentUser } from './redux/user/user.actions';
 import { toggleCartHidden } from './redux/cart/cart.actions';
 import { selectCurrentUser } from './redux/user/user.selectors';
 import { selectCartHidden } from './redux/cart/cart.selectors';
+
+import { GlobalStyle } from './global.styles';
 
 const App = ({ setCurrentUser, hidden, isCartHidden, currentUser }) => {
   const [unsubscribeFromAuth, setUnsubscribeFromAuth] = useState(() => null);
@@ -50,6 +52,7 @@ const App = ({ setCurrentUser, hidden, isCartHidden, currentUser }) => {
 
   return (
     <>
+      <GlobalStyle />
       <Header />
       <div onClick={isCartHidden ? null : hidden}>
         <Switch >
