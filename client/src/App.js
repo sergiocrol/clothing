@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -6,17 +6,21 @@ import { createStructuredSelector } from 'reselect';
 
 import { auth, createUserProfileDocument } from './firebase/firebase.utils';
 
-import HomePage from './pages/homepage/homepage.component';
-import ShopPage from './pages/shop/shop.component';
-import SignPage from './pages/signpage/signpage.component';
-import CheckoutPage from './pages/checkout/checkout.component';
 import Header from './components/header/header.component';
 import { setCurrentUser } from './redux/user/user.actions';
 import { toggleCartHidden } from './redux/cart/cart.actions';
 import { selectCurrentUser } from './redux/user/user.selectors';
 import { selectCartHidden } from './redux/cart/cart.selectors';
+import Spinner from './components/spinner/spinner.component';
+import ErrorBoundary from './components/error-boundary/error-boundary.component';
 
 import { GlobalStyle } from './global.styles';
+
+// import through lazy, so we chunk our pages in order to load only what we want
+const HomePage = lazy(() => import('./pages/homepage/homepage.component'));
+const ShopPage = lazy(() => import('./pages/shop/shop.component'));
+const SignPage = lazy(() => import('./pages/signpage/signpage.component'));
+const CheckoutPage = lazy(() => import('./pages/checkout/checkout.component'));
 
 const App = ({ setCurrentUser, hidden, isCartHidden, currentUser }) => {
   const [unsubscribeFromAuth, setUnsubscribeFromAuth] = useState(() => null);
@@ -56,10 +60,14 @@ const App = ({ setCurrentUser, hidden, isCartHidden, currentUser }) => {
       <Header />
       <div onClick={isCartHidden ? null : hidden}>
         <Switch >
-          <Route exact path='/' component={HomePage} />
-          <Route path='/shop' component={ShopPage} />
-          <Route exact path='/signin' render={() => currentUser ? <Redirect to='/' /> : <SignPage />} />
-          <Route excat path='/checkout' component={CheckoutPage} />
+          <ErrorBoundary>
+            <Suspense fallback={<Spinner />}>
+              <Route exact path='/' component={HomePage} />
+              <Route path='/shop' component={ShopPage} />
+              <Route exact path='/signin' render={() => currentUser ? <Redirect to='/' /> : <SignPage />} />
+              <Route excat path='/checkout' component={CheckoutPage} />
+            </Suspense>
+          </ErrorBoundary>
         </Switch>
       </div>
     </>
