@@ -55,6 +55,7 @@ npm start
 - **styled-components:** Compile scss to css
 - **react-redux:** For the state management
 - **stripe:** For handle the payments
+- **express:** To create an POST end-point for the payment
 - **firebase:** In order to Google Authentication and storage images
 
 ## Git
